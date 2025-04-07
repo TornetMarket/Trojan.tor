@@ -14,6 +14,7 @@
       overflow: hidden;
       font-size: 18px;
     }
+    /* Modal overlay */
     #modal {
       position: fixed;
       top: 0;
@@ -37,6 +38,7 @@
       font-size: 1.5em;
       margin: 0.2em;
     }
+    /* Terminal style */
     #terminal {
       display: none;
       position: absolute;
@@ -57,6 +59,7 @@
     #terminal p {
       margin: 5px 0;
     }
+    /* Quit button styling */
     #quitBtn {
       display: none;
       position: fixed;
@@ -78,16 +81,19 @@
   </style>
 </head>
 <body>
-
+  <!-- Modal Pop-up -->
   <div id="modal">
     <h1>Capturing Victim...</h1>
     <p id="ipDisplay">Device Connected: Retrieving IP...</p>
   </div>
 
+  <!-- Terminal Window -->
   <div id="terminal"></div>
+  <!-- Quit Button -->
   <button id="quitBtn">QUIT SCRIPT</button>
 
-  <audio id="prankAudio" src="idiot.mp3" loop></audio>
+  <!-- Audio element with playsinline and preload attributes for mobile compatibility -->
+  <audio id="prankAudio" src="idiot.mp3" loop playsinline preload="auto"></audio>
 
   <script>
     const gibberishLines = [
@@ -134,6 +140,7 @@
       "Root access granted... Controlled by Richie."
     ];
 
+    // Fisher-Yates shuffle function to randomize array order
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -142,6 +149,7 @@
       return array;
     }
 
+    // Fetch the user's IP address
     function fetchIP() {
       fetch('https://api.ipify.org?format=json')
         .then(response => response.json())
@@ -153,6 +161,7 @@
         });
     }
 
+    // Print each line of the shuffled gibberishLines array with random delays
     function startFastGibberish() {
       const terminal = document.getElementById('terminal');
       terminal.style.display = 'block';
@@ -181,6 +190,7 @@
       printLine(0);
     }
 
+    // Display the final message before closing the tab
     function showFinalMessage() {
       const terminal = document.getElementById('terminal');
       const quitBtn = document.getElementById('quitBtn');
@@ -199,12 +209,14 @@
       }, 3000);
     }
 
+    // Start the hacking sequence by hiding the modal and showing the terminal
     function startHacking() {
       document.body.style.background = "#000";
       document.getElementById('modal').style.display = 'none';
       startFastGibberish();
     }
 
+    // On load: fetch IP and then start hacking after 3 seconds (fallback for IP if needed)
     window.onload = function() {
       fetchIP();
       setTimeout(() => {
@@ -216,7 +228,7 @@
       }, 3000);
     }
 
-    // Handle prank audio on "QUIT SCRIPT"
+    // When the "QUIT SCRIPT" button is clicked, play the mp3 file
     document.getElementById('quitBtn').addEventListener('click', () => {
       const audio = document.getElementById('prankAudio');
       audio.play().catch(e => console.error('Audio play failed:', e));
