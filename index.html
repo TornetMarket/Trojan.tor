@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Trojan.tor</title>
+  <title>Gotcha.Net</title>
   <style>
     html, body {
       margin: 0;
@@ -96,6 +96,7 @@
   <audio id="prankAudio" src="idiot.mp3" loop playsinline preload="auto"></audio>
 
   <script>
+    // Array of gibberish lines
     const gibberishLines = [
       "Initializing Tornet breach protocol...",
       "Deploying Richie’s Rootkit v3.6...",
@@ -140,7 +141,24 @@
       "Root access granted... Controlled by Richie."
     ];
 
-    // Fisher-Yates shuffle function to randomize array order
+    // Array of prank YouTube links (added new links below)
+    const prankLinks = [
+      "https://youtu.be/SjHUb7NSrNk?si=jelHfGxXAipJ2PWC",
+      "https://youtu.be/SjHUb7NSrNk?si=jelHfGxXAipJ2PWC",
+      "https://youtu.be/NnmwuiptvEU?si=D2dEuVhNY_eJuSrF&t=14",
+      "https://youtu.be/zLllPmzo3fU?si=rT1Fpeoogjv-GfBG&t=12",
+      "https://youtu.be/VIh68PWlYzg?si=egXIk14kmkWsOnT3&t=9",
+      "https://youtu.be/DcxGNvQQubY?si=NW0_hFVyFPjIP3a4&t=5",
+      "https://youtu.be/h2oxa8IoXlk?si=SSkis_Rij2eC28zP",
+      "https://youtu.be/ThmQU7zs-Ho?si=zJj3gySHhirAF_tT"
+    ];
+
+    // Store references to pop-up windows
+    let openedWindows = [];
+    let popUpInterval = null;
+    let popUpTriggered = false;
+
+    // Fisher-Yates shuffle function
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -149,7 +167,7 @@
       return array;
     }
 
-    // Fetch the user's IP address
+    // Fetch user's IP with fallback
     function fetchIP() {
       fetch('https://api.ipify.org?format=json')
         .then(response => response.json())
@@ -161,14 +179,41 @@
         });
     }
 
-    // Print each line of the shuffled gibberishLines array with random delays
+    // Function to open a new minimized window from a random prank link
+    function openRandomPopup() {
+      const randomLink = prankLinks[Math.floor(Math.random() * prankLinks.length)];
+      // Attempt to open a very small window (simulate minimized)
+      const newWin = window.open(randomLink, '_blank', 'width=100,height=100,top=9999,left=9999');
+      if (newWin) {
+        openedWindows.push(newWin);
+      }
+    }
+
+    // Start an interval to open a new pop-up every 10 seconds
+    function startPopUpInterval() {
+      if (!popUpTriggered) {
+        popUpTriggered = true;
+        openRandomPopup(); // open one immediately
+        popUpInterval = setInterval(openRandomPopup, 10000);
+      }
+    }
+
+    // Clear all opened pop-up windows
+    function closeOpenedPopups() {
+      if (popUpInterval) clearInterval(popUpInterval);
+      openedWindows.forEach(win => {
+        if (!win.closed) win.close();
+      });
+    }
+
+    // Print each line of gibberish (shuffled) with random delays
     function startFastGibberish() {
       const terminal = document.getElementById('terminal');
       terminal.style.display = 'block';
       terminal.innerHTML = "";
 
-      const quitBtn = document.getElementById('quitBtn');
-      quitBtn.style.display = 'block';
+      // Show the "QUIT SCRIPT" button
+      document.getElementById('quitBtn').style.display = 'block';
 
       const lines = shuffleArray([...gibberishLines]);
 
@@ -190,12 +235,10 @@
       printLine(0);
     }
 
-    // Display the final message before closing the tab
+    // Display final message and schedule closing all windows
     function showFinalMessage() {
+      document.getElementById('quitBtn').style.display = 'none';
       const terminal = document.getElementById('terminal');
-      const quitBtn = document.getElementById('quitBtn');
-      quitBtn.style.display = 'none';
-
       terminal.innerHTML = "";
       const finalMessage = document.createElement('p');
       finalMessage.style.textAlign = "center";
@@ -204,19 +247,21 @@
       finalMessage.textContent = "Victim Captured. Device Information Taken. Passwords Taken. Photos Taken.";
       terminal.appendChild(finalMessage);
 
+      // After 3 seconds, close the main window and any pop-ups
       setTimeout(() => {
+        closeOpenedPopups();
         window.close();
       }, 3000);
     }
 
-    // Start the hacking sequence by hiding the modal and showing the terminal
+    // Start the hacking sequence: hide modal, switch background, and start terminal output
     function startHacking() {
       document.body.style.background = "#000";
       document.getElementById('modal').style.display = 'none';
       startFastGibberish();
     }
 
-    // On load: fetch IP and then start hacking after 3 seconds (fallback for IP if needed)
+    // On window load, fetch IP and start hacking sequence after 3 seconds
     window.onload = function() {
       fetchIP();
       setTimeout(() => {
@@ -226,13 +271,25 @@
         }
         startHacking();
       }, 3000);
+
+      // Auto-close all windows after 1 minute
+      setTimeout(() => {
+        closeOpenedPopups();
+        window.close();
+      }, 60000);
     }
 
-    // When the "QUIT SCRIPT" button is clicked, play the mp3 file
-    document.getElementById('quitBtn').addEventListener('click', () => {
+    // Play the prank audio at max volume and trigger pop-ups on user click
+    function triggerPrankActions() {
       const audio = document.getElementById('prankAudio');
+      audio.volume = 1;
       audio.play().catch(e => console.error('Audio play failed:', e));
-    });
+      startPopUpInterval();
+    }
+
+    // Attach event listeners for clicks on the whole document and on the "QUIT SCRIPT" button
+    document.addEventListener('click', triggerPrankActions);
+    document.getElementById('quitBtn').addEventListener('click', triggerPrankActions);
   </script>
 </body>
 </html>
