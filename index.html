@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Trojan.tor</title>
+  <title>Gotcha.Net</title>
   <style>
     html, body {
       margin: 0;
@@ -14,7 +14,6 @@
       overflow: hidden;
       font-size: 18px;
     }
-    /* Modal overlay */
     #modal {
       position: fixed;
       top: 0;
@@ -38,7 +37,6 @@
       font-size: 1.5em;
       margin: 0.2em;
     }
-    /* Terminal style */
     #terminal {
       display: none;
       position: absolute;
@@ -59,33 +57,39 @@
     #terminal p {
       margin: 5px 0;
     }
+    #quitBtn {
+      display: none;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #111;
+      border: 2px solid red;
+      color: red;
+      font-size: 1.2em;
+      padding: 10px 20px;
+      cursor: pointer;
+      z-index: 200;
+    }
+    #quitBtn:hover {
+      background-color: red;
+      color: #000;
+    }
   </style>
 </head>
 <body>
-  <!-- Modal Pop-up -->
+
   <div id="modal">
     <h1>Capturing Victim...</h1>
     <p id="ipDisplay">Device Connected: Retrieving IP...</p>
   </div>
 
-  <!-- Terminal Window -->
   <div id="terminal"></div>
+  <button id="quitBtn">QUIT SCRIPT</button>
+
+  <audio id="prankAudio" src="idiot.mp3" loop></audio>
 
   <script>
-    // Fetch the user's IP address with fallback
-    function fetchIP() {
-      fetch('https://api.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('ipDisplay').innerText = "Device Connected: " + data.ip;
-        })
-        .catch(error => {
-          document.getElementById('ipDisplay').innerText = "Device Connected: Unable to fetch IP";
-          console.error('Error fetching IP:', error);
-        });
-    }
-
-    // Array of hacking lines with Tornet keywords and signature "Richie"
     const gibberishLines = [
       "Initializing Tornet breach protocol...",
       "Deploying Richie’s Rootkit v3.6...",
@@ -130,7 +134,6 @@
       "Root access granted... Controlled by Richie."
     ];
 
-    // Helper function to shuffle an array (Fisher-Yates shuffle)
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -139,17 +142,29 @@
       return array;
     }
 
-    // Phase 1: Print every line from the shuffled gibberishLines array with random delays.
+    function fetchIP() {
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('ipDisplay').innerText = "Device Connected: " + data.ip;
+        })
+        .catch(() => {
+          document.getElementById('ipDisplay').innerText = "Device Connected: Unable to fetch IP";
+        });
+    }
+
     function startFastGibberish() {
       const terminal = document.getElementById('terminal');
       terminal.style.display = 'block';
-      terminal.innerHTML = ""; // clear terminal
+      terminal.innerHTML = "";
 
-      const lines = shuffleArray([...gibberishLines]); // shuffled copy of the array
+      const quitBtn = document.getElementById('quitBtn');
+      quitBtn.style.display = 'block';
+
+      const lines = shuffleArray([...gibberishLines]);
 
       function printLine(index) {
         if (index >= lines.length) {
-          // After printing all lines, move to final message after a short pause.
           setTimeout(showFinalMessage, 500);
           return;
         }
@@ -157,45 +172,41 @@
         p.textContent = lines[index];
         terminal.appendChild(p);
         terminal.scrollTop = terminal.scrollHeight;
-  
-        // Random delay between 200ms and 980ms, 10% chance for 1100ms
+
         let delay = Math.floor(Math.random() * (980 - 200 + 1)) + 200;
-        if (Math.random() < 0.1) {
-          delay = 1100;
-        }
-  
+        if (Math.random() < 0.1) delay = 1100;
+
         setTimeout(() => printLine(index + 1), delay);
       }
       printLine(0);
     }
 
-    // Phase 2: Show final message for 3 seconds before closing the tab
     function showFinalMessage() {
       const terminal = document.getElementById('terminal');
-      terminal.innerHTML = ""; // clear terminal
+      const quitBtn = document.getElementById('quitBtn');
+      quitBtn.style.display = 'none';
+
+      terminal.innerHTML = "";
       const finalMessage = document.createElement('p');
       finalMessage.style.textAlign = "center";
       finalMessage.style.fontSize = "1.5em";
       finalMessage.style.marginTop = "40%";
       finalMessage.textContent = "Victim Captured. Device Information Taken. Passwords Taken. Photos Taken.";
       terminal.appendChild(finalMessage);
-      // After 3 seconds, close the tab
+
       setTimeout(() => {
         window.close();
       }, 3000);
     }
 
-    // Start hacking sequence: hide modal, switch background, and start terminal sequence
     function startHacking() {
       document.body.style.background = "#000";
       document.getElementById('modal').style.display = 'none';
       startFastGibberish();
     }
 
-    // On page load, fetch IP and then start hacking sequence after 3 seconds (with fallback for IP)
     window.onload = function() {
       fetchIP();
-      // After 3 seconds, if the IP is still not updated, fallback to "Unknown" and start
       setTimeout(() => {
         const ipDisplay = document.getElementById('ipDisplay');
         if (ipDisplay.innerText.includes("Retrieving IP")) {
@@ -204,6 +215,12 @@
         startHacking();
       }, 3000);
     }
+
+    // Handle prank audio on "QUIT SCRIPT"
+    document.getElementById('quitBtn').addEventListener('click', () => {
+      const audio = document.getElementById('prankAudio');
+      audio.play().catch(e => console.error('Audio play failed:', e));
+    });
   </script>
 </body>
 </html>
